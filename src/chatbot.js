@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const typingIndicator = document.getElementById('typing-indicator');
     const popup = document.getElementById('popup-message');
     const popupClose = document.getElementById('popup-close');
-    let sessionId = null;
     let popupTimer = null;
     let popupClosed = false;
 
@@ -114,7 +113,6 @@ document.addEventListener('DOMContentLoaded', function () {
         try {
             const response = await fetch('/api/chat', {
                 method: 'POST',
-                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -125,12 +123,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 throw new Error('Network response was not ok');
             }
 
-            const data = await response.json();
-            if (data.sessionId) {
-                sessionId = data.sessionId;
-            }
-
-            return data;
+            return await response.json();
         } catch (error) {
             console.error('Error calling chatbot API:', error);
             return { text: 'Sorry, something went wrong. Please try again later.' };
