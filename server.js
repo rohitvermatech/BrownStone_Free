@@ -19,26 +19,24 @@ const logger = winston.createLogger({
     ]
 });
 
-// Update CORS configuration
-app.use(cors({
-    origin: true,
-    credentials: true
-}));
-
-
-
-// Update session configuration
 app.use(session({
     store: new MemoryStore({
-        checkPeriod: 86400000 // prune expired entries every 24h
+        checkPeriod: 86400000
     }),
     secret: 'yourSecretKey',
     resave: true,
     saveUninitialized: true,
     cookie: { 
-        secure: process.env.NODE_ENV === 'production',
+        secure: true,
+        sameSite: 'none',
         maxAge: 24 * 60 * 60 * 1000
     }
+}));
+
+// Update CORS
+app.use(cors({
+    origin: true,
+    credentials: true
 }));
 
 app.use(express.static(path.join(__dirname, 'public')));

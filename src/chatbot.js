@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ message, messageType, sessionId })
+                body: JSON.stringify({ message, messageType })
             });
 
             if (!response.ok) {
