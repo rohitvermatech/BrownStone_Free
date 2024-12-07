@@ -23,9 +23,11 @@ const generateBotReply = async (userInput, messageType, session = {}) => {
 
 const handleButtonClick = (payload, session = {}) => {
     console.log("Button clicked:", payload);
+    console.log("Session state:", session);
 
     if (payload === 'NAME_EMAIL_CONTACT') {
         session.userDetails = { step: 'name' };
+        console.log("Set session userDetails:", session.userDetails);
         return {
             text: "Great! Let's start with your name. What's your full name?",
             showInput: true,
