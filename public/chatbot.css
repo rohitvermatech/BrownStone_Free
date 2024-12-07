@@ -271,3 +271,16 @@ body {
 .button-container button:active {
     transform: scale(0.95);
 }
+
+#chatbot-toggle img {
+    width: 35px;  /* Adjust size as needed */
+    height: 35px;  /* Adjust size as needed */
+    object-fit: contain;
+}
+
+#chatbot-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;  /* Remove default padding */
+}
