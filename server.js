@@ -7,6 +7,8 @@ const winston = require('winston');
 const app = express();
 const port = 3000;
 
+const MemoryStore = require('memorystore')(session);
+
 const logger = winston.createLogger({
     level: 'info',
     format: winston.format.simple(),
@@ -17,13 +19,25 @@ const logger = winston.createLogger({
     ]
 });
 
-app.use(cors());
+// Update CORS configuration
+app.use(cors({
+    origin: true,
+    credentials: true
+}));
 
+
+// Update session configuration
 app.use(session({
-    secret: 'yourSecretKey',  // Replace with a secure key
-    resave: false,
+    store: new MemoryStore({
+        checkPeriod: 86400000 // prune expired entries every 24h
+    }),
+    secret: 'yourSecretKey',
+    resave: true,
     saveUninitialized: true,
-    cookie: { secure: false }  // Set to true if using HTTPS
+    cookie: { 
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 24 * 60 * 60 * 1000
+    }
 }));
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -34,6 +48,7 @@ app.get('/', (req, res) => {
 });
 
 app.post('/api/chat', express.json(), async (req, res) => {
+    // Destructure from req.body
     const { message, messageType } = req.body;
 
     if (!req.session.userId) {
@@ -49,12 +64,13 @@ app.post('/api/chat', express.json(), async (req, res) => {
         const botReply = await generateBotReply(message, messageType, req.session);
         setTimeout(() => {
             res.json(botReply);
-        }, 1000); // 1 second delay
+        }, 1000);
     } catch (error) {
         logger.error('Error processing bot reply:', error);
         res.status(500).json({ error: 'Failed to generate bot response.' });
     }
 });
+
 
 app.use((req, res, next) => {
     res.status(404).json({ error: 'Route not found' });

@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
+    // DOM Elements
     const chatbotContainer = document.getElementById('chatbot-container');
     const chatbotToggle = document.getElementById('chatbot-toggle');
     const chatbotClose = document.getElementById('chatbot-close');
@@ -6,11 +7,50 @@ document.addEventListener('DOMContentLoaded', function () {
     const userInput = document.getElementById('user-input');
     const sendButton = document.getElementById('send-button');
     const typingIndicator = document.getElementById('typing-indicator');
-    let sessionId = null;  // Store session ID for multiple users
+    const popup = document.getElementById('popup-message');
+    const popupClose = document.getElementById('popup-close');
+    let sessionId = null;
+    let popupTimer = null;
+    let popupClosed = false;
 
-    // Toggle chatbot open and close
+    // Show popup on initial page load
+    function showInitialPopup() {
+        if (popup && !popupClosed) {
+            popupTimer = setTimeout(() => {
+                popup.classList.remove('popup-hidden');
+            }, 3000);
+        }
+    }
+
+    // Show popup when chatbot closes
+    function showPopupAfterChatbot() {
+        if (popup && !popupClosed) {
+            popupTimer = setTimeout(() => {
+                popup.classList.remove('popup-hidden');
+            }, 3000);
+        }
+    }
+
+    // Initial popup on page load
+    showInitialPopup();
+
+    // Close popup when clicked
+    if (popupClose) {
+        popupClose.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (popup) {
+                popup.classList.add('popup-hidden');
+                popupClosed = true;
+                clearTimeout(popupTimer);
+            }
+        });
+    }
+
+    // Hide popup when chatbot is opened
     chatbotToggle.addEventListener('click', function () {
         chatbotContainer.classList.add('expanded');
+        if (popup) popup.classList.add('popup-hidden');
+        clearTimeout(popupTimer);
         setTimeout(() => {
             userInput.focus();
         }, 300);
@@ -18,6 +58,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     chatbotClose.addEventListener('click', function () {
         chatbotContainer.classList.remove('expanded');
+        showPopupAfterChatbot();
     });
 
     // Function to add messages to the chat UI
@@ -68,7 +109,7 @@ document.addEventListener('DOMContentLoaded', function () {
         indicators.forEach(indicator => indicator.remove());
     }
 
-    // Call chatbot API, passing messageType ('text' or 'button')
+    // Call chatbot API
     async function callChatbotAPI(message, messageType) {
         try {
             const response = await fetch('/api/chat', {
@@ -76,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ message, messageType, sessionId })  // Include sessionId
+                body: JSON.stringify({ message, messageType, sessionId })
             });
 
             if (!response.ok) {
@@ -84,8 +125,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             const data = await response.json();
-
-            // Store sessionId for multi-user handling
             if (data.sessionId) {
                 sessionId = data.sessionId;
             }
@@ -97,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Handle user input (text or button click)
+    // Handle user input
     async function handleUserInput(message, messageType = 'text', displayText = null) {
         if (messageType === 'text') {
             message = userInput.value.trim();
@@ -128,8 +167,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-
-    // Add multiple messages to the chat UI with a delay
+    // Add multiple messages
     async function addMultipleMessages(messages, delay = 1000) {
         for (const message of messages) {
             showTypingIndicator();
@@ -139,7 +177,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Toggle input visibility and placeholder
+    // Toggle input visibility
     function toggleInputVisibility(show, promptMessage = '') {
         const inputContainer = document.getElementById('chatbot-input');
         if (show) {
@@ -151,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Handle send button click or "Enter" key press for sending a message
+    // Event listeners
     sendButton.addEventListener('click', () => handleUserInput(userInput.value.trim(), 'text'));
     userInput.addEventListener('keypress', function (e) {
         if (e.key === 'Enter') {
@@ -159,10 +197,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Show typing indicator at initial load
+    // Initial setup
     showTypingIndicator();
 
-    // Initial messages when chatbot is loaded
+    // Initial messages
     const initialMessages = [
         { text: "Hello, welcome to Brownstone EDI Guru." },
         { text: "We are here to advise and support you to ensure equity, diversity, and inclusion (EDI) policies work for you." },
@@ -177,7 +215,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     ];
 
-    // Add initial messages to chat UI
+    // Initialize chat
     addMultipleMessages(initialMessages).then(() => {
         const lastMessage = initialMessages[initialMessages.length - 1];
         toggleInputVisibility(lastMessage.showInput, lastMessage.inputPrompt);

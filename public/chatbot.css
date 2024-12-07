@@ -284,3 +284,103 @@ body {
     justify-content: center;
     padding: 0;  /* Remove default padding */
 }
+
+.popup-hidden {
+    display: none !important; /* Added !important to ensure it overrides other styles */
+}
+
+/* Popup specific changes - add these properties */
+#popup-message {
+    position: fixed;
+    bottom: 100px;
+    right: 20px;
+    background-color: white;
+    padding: 15px 20px;  /* Increased horizontal padding */
+    border-radius: 12px;  /* Slightly larger radius */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);  /* Enhanced shadow */
+    z-index: 9998;
+    display: flex;
+    align-items: center;
+    gap: 12px;  /* Increased gap */
+    animation: slideIn 0.5s ease-out;
+    border: 1px solid rgba(0,0,0,0.1);  /* Subtle border */
+    max-width: 300px;  /* Maximum width */
+    min-width: 200px;  /* Minimum width */
+}
+
+#popup-message .popup-logo {
+    width: 35px;  /* Slightly larger logo */
+    height: 35px;
+    object-fit: contain;
+    flex-shrink: 0;  /* Prevent logo from shrinking */
+}
+
+#popup-message p {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--text-color);
+    flex-grow: 1;  /* Allow text to take available space */
+}
+
+#popup-close {
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    padding: 0 5px;
+    color: #666;
+    transition: color 0.3s ease;
+    flex-shrink: 0;  /* Prevent button from shrinking */
+    align-self: flex-start;  /* Align to top */
+    margin-left: auto;  /* Push to right */
+}
+
+#popup-close:hover {
+    color: #333;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Add animation for popup hide */
+@keyframes slideOut {
+    from {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateY(100px);
+        opacity: 0;
+    }
+}
+
+.popup-hidden {
+    display: none;
+    animation: slideOut 0.5s ease-out;
+}
+
+/* Add media query for mobile responsiveness */
+@media screen and (max-width: 480px) {
+    #popup-message {
+        bottom: 80px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+        padding: 12px 15px;
+    }
+    
+    #popup-message .popup-logo {
+        width: 30px;
+        height: 30px;
+    }
+}

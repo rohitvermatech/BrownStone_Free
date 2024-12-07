@@ -47,15 +47,18 @@ const handleButtonClick = (payload, session = {}) => {
 
 const handleTextInput = (message, session = {}) => {
     console.log("Text input received:", message);
+    console.log("Session state:", session); // Add this
     if (session.userDetails) {
         return handleUserDetails(message, session);
     }
     else {
+        console.log("No session.userDetails found"); // Add this
         return flowData.FALLBACK;
     }
 };
 
 const handleUserDetails = (message, session) => {
+    console.log("Processing user details:", session.userDetails); // Add this
     switch (session.userDetails.step) {
         case 'name':
             if (isValidName(message)) {
