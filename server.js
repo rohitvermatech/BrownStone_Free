@@ -6,6 +6,14 @@ const winston = require('winston');
 const app = express();
 const port = 3000;
 
+require('dotenv').config();
+const mongoose = require('mongoose');
+
+// Add MongoDB connection using env variable
+mongoose.connect(process.env.MONGODB_URI)
+    .then(() => console.log('Connected to MongoDB'))
+    .catch(err => console.error('MongoDB connection error:', err));
+    
 const logger = winston.createLogger({
     level: 'info',
     format: winston.format.simple(),

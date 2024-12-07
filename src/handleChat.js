@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const User = require('./models/User');
 
 const flowData = JSON.parse(fs.readFileSync(path.join(__dirname, 'flow.json'), 'utf8'));
 let userDetails = {};
@@ -35,15 +36,14 @@ const handleButtonClick = (payload) => {
     return flowData[payload] || flowData.FALLBACK;
 };
 
-const handleTextInput = (message) => {
-    console.log("Text input received:", message);
+const handleTextInput = async (message) => {
     if (userDetails.step) {
-        return handleUserDetails(message);
+        return await handleUserDetails(message);
     }
     return flowData.FALLBACK;
 };
 
-const handleUserDetails = (message) => {
+const handleUserDetails = async (message) => {
     switch (userDetails.step) {
         case 'name':
             if (isValidName(message)) {
@@ -81,6 +81,20 @@ const handleUserDetails = (message) => {
             if (isValidContact(message)) {
                 userDetails.contact = message;
                 userDetails.step = 'completed';
+
+                // Save to MongoDB
+                try {
+                    const user = new User({
+                        name: userDetails.name,
+                        email: userDetails.email,
+                        contact: message
+                    });
+                    await user.save();
+                    console.log('User saved to MongoDB:', user);
+                } catch (error) {
+                    console.error('MongoDB save error:', error);
+                }
+
                 return {
                     text: `Thank you, ${userDetails.name.split(' ')[0]}! Lovely to meet you. What's happening with you and how can we help?`,
                     buttons: [
@@ -93,12 +107,6 @@ const handleUserDetails = (message) => {
                     ],
                     showInput: false,
                     inputPrompt: "Select a topic or type your question"
-                };
-            } else {
-                return {
-                    text: "Please enter a valid contact number.",
-                    showInput: true,
-                    inputPrompt: "Enter your contact number"
                 };
             }
     }
